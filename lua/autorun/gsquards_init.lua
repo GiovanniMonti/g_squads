@@ -4,6 +4,7 @@ gsquads = gsquads or {}
 if SERVER then
     include("g_squads/sv_factions.lua")
     include("g_squads/sv_squads.lua")
+    include("g_squads/sv_chatcommands.lua")
     print([[
     ---------------------------------\n
     ---------------------------------\n

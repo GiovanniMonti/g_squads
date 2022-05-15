@@ -44,6 +44,14 @@ squad_mt:Delete = function()
     hook.Run('Gsquads_PreSquadDelete',self)
 end
 
+function gsquads.Squads.CanCreate(ply)
+    --TODO Make function
+end
+
+function gsquads.Squads.CanJoin(ply)
+    --TODO Make function
+end
+
 function gsquads.Squads:CreateNew(creator)
     if self.Config.squads_Maxnum <= self.Count or self: then return false end
     -- checks here
