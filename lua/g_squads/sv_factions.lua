@@ -1,4 +1,3 @@
-
 gsquads.Factions = gsquads.Factions or {}
 gsquads.Factions.list = gsquads.Factions.list or { [ 1 ] = {
     Name = 'No Faction',
@@ -28,9 +27,17 @@ end
 
 function gsquads.Factions.GetFaction(job)
     if not isnumber(job) or not RPExtraTeams[job] then return false end
-    return gsquads.Factions.jobsToFaction[job]
+    return gsquads.Factions.jobsToFaction[job] or 0
 end
 
 hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp',function()
     include('config/factions_config.lua')
+end)
+
+hook.Add('PlayerChangedTeam','gsquads::PlayerChangedTeam',function(ply,oteam,nteam)
+    local ofac = gsquads.Factions.GetFaction(oteam) or 0
+    local nfac = gsquads.Factions.GetFaction(nteam)
+    if not nfac or ofac == nfac then return end
+    -- hook into here for custom prints and such
+    hook.Run('GsquadsPlayerChangedFaction', ply, ofac, nfac) 
 end)
