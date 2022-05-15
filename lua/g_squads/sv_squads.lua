@@ -31,12 +31,17 @@ squad_mt.__sub = function(squad, nply)
     if nply == squad.Commander then return false end
 
     table.RemoveByValue( squad.Members, nply )
-    if #squad.Members<1 then return squad:Delete() end
+    if #squad.Members<1 then squad:Delete() end
     return true
 end
 
+ -- delete the squad
 squad_mt:Delete = function()
-    -- delete the squad
+    for k,v in self.Members do
+        v:SetNWInt('gsquads::squad',0)
+    end
+    -- for other stuff later in the script
+    hook.Run('Gsquads_PreSquadDelete',self)
 end
 
 function gsquads.Squads:CreateNew(creator)
