@@ -45,11 +45,12 @@ squad_mt:Delete = function()
 end
 
 function gsquads.Squads.CanCreate(ply)
-    --TODO Make function
+    if ply:GetNWInt('gsquads::squad',0) ~= 0 then return false end
 end
 
-function gsquads.Squads.CanJoin(ply)
-    --TODO Make function
+function gsquads.Squads.CanJoin(ply,squad)
+    local cursquad = gsquads.Squads.list[squad]
+    if gsquads.Factions.jobsToFaction[ply:Team()] ~= cursquad.Faction then return false end
 end
 
 function gsquads.Squads:CreateNew(creator)
