@@ -6,7 +6,7 @@ gsquads.Squads.list = {}
 
 local squad_mt = {
     Members = {},
-    Commander = 0,-- indx of commander in members table
+    Commander = 1,-- indx of commander in members table
     Kills = 0,
     Deaths = 0,
     Faction = 0
@@ -62,6 +62,17 @@ function gsquads.Squads:CreateNew(creator)
     newsquad + creator -- adds creator into squad (commander by default)
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
     self.Count = self.Count + 1
+end
+
+function gsquads.Squads:GetSquadbyCmndName(nick)
+    local cmnd = gsquads.IsPlyNick( nick )
+    if not cmnd then return false end
+    for squad, tbl in pairs(self.list) do
+        if tbl.Members[tbl.Commander] == cmnd then
+            return squad
+        end
+    end
+    return false
 end
 
 function gsquads.Squads:GetCurSquad(ply)
