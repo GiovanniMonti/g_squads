@@ -13,22 +13,36 @@ ChatCommands.create = function(ply,text)
     return ''
 end
 
---! decide how to join a squad, doesnt work atm
+--TODO do this
 ChatCommands.join = function(ply,text)
     local args = string.Explode( ' ', text)
-    if #args < 2 then return false end
+
+    -- local comander = findByName(args[1]) 
+    -- local squadJoiing = getSquadbyLeader(comander)
+
+    if #args < 1 then return false end
     if not gsquads.Squads.CanJoin(ply,) then
         ply:ChatPrint('You cannot join this squad at this time.')
         return ''
     end
     
+    gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
+
     return ''
 end
 
---! decide how to join a squad, doesnt work atm
+--? decide how to leave a squad, doesnt work atm
 ChatCommands.leave = function(ply,text)
-    local args = string.Explode( ' ', text)
-    
+    --local args = string.Explode( ' ', text)
+
+    local cursquad =  ply:GetNWInt('gsquads::squad')
+
+    if not cursquad or cursquad == 0 then 
+        ply:ChatPrint('You are not in squad.')
+        return false
+    end
+    gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
+
     return ''
 end
 
