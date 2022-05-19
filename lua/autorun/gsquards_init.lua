@@ -1,9 +1,10 @@
 // this addon is for darkrp
 if not DarkRP then return end
+
 gsquads = gsquads or {}
 
-
 local function loadExtraFunctions()
+
     function gsquads.IsPlyNick( nick )
         for _, v in pairs( player.GetAll() ) do
             
@@ -13,15 +14,16 @@ local function loadExtraFunctions()
         end
         return false
     end
+
 end
-
 if SERVER then
-
     loadExtraFunctions()
 
     include("g_squads/sv_factions.lua")
     include("g_squads/sv_squads.lua")
     include("g_squads/sv_chatcommands.lua")
+
+    --AddCSLuaFile("g_squads/cl_squads.lua")
     print([[
     ---------------------------------\n
     ---------------------------------\n
@@ -32,7 +34,7 @@ if SERVER then
 end
 
 if CLIENT then
-    include("g_squads/cl_squads.lua")
+    --include("g_squads/cl_squads.lua")
     print([[
     ---------------------------------\n
     ---------------------------------\n

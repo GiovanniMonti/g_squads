@@ -13,20 +13,28 @@ ChatCommands.create = function(ply,text)
     return ''
 end
 
---TODO do this
 ChatCommands.join = function(ply,text)
     local args = string.Explode( ' ', text)
+    if #args < 2 then return false end
+    local comander = gsquads.IsPlyNick( args[1] )
+    local squadJoining = gsquads.Squads:GetSquadbyCmnd(comander)
 
-    -- local comander = findByName(args[1]) 
-    -- local squadJoiing = getSquadbyLeader(comander)
+    if not squadJoining then
+        ply:ChatPrint('This user is not in a squad or was not found!')
+        return ''
+    end
 
-    if #args < 1 then return false end
-    if not gsquads.Squads.CanJoin(ply,) then
+    if table.HasValue( squadJoining.list, ply ) then
+        ply:ChatPrint('You are already in this squad!')
+        return ''
+    end
+
+    if not gsquads.Squads.CanJoin(ply,squadJoining) then
         ply:ChatPrint('You cannot join this squad at this time.')
         return ''
     end
     
-    gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
+    local _ = gsquads.Squads.list[ ply:GetNWInt(cursquad) ] + ply
 
     return ''
 end
@@ -41,7 +49,7 @@ ChatCommands.leave = function(ply,text)
         ply:ChatPrint('You are not in squad.')
         return false
     end
-    gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
+    local _ = gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
 
     return ''
 end
@@ -50,10 +58,12 @@ hook.Add('PlayerSay','gsquads::PlayerSay',function(ply,text_o,tmch)
     text = text_o
     if not string.StartWith( text, commandprefix ) then return end
     text = string.TrimLeft(text,commandprefix)
-    
-    for k,fnc in ipairs(ChatCommands) do
+    text = string.TrimLeft(text,' ')
+
+    for k,fnc in pairs(ChatCommands) do
         if string.StartWith(text,k) then
             return (fnc( ply, string.TrimLeft(text,k) ) or text_o)
         end
     end
 end)
+

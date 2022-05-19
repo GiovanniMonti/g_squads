@@ -1,4 +1,5 @@
 gsquads.Squads = gsquads.Squads or {}
+
 include('config/squads_config.lua')
 
 gsquads.Squads.Count = 0
@@ -9,7 +10,7 @@ local squad_mt = {
     Commander = 1,-- indx of commander in members table
     Kills = 0,
     Deaths = 0,
-    Faction = 0
+    Faction = 0,
     id = 0
 }
 -- add new player to squad
@@ -36,8 +37,8 @@ squad_mt.__sub = function(squad, nply)
 end
 
  -- delete the squad
-squad_mt:Delete = function()
-    for k,v in self.Members do
+squad_mt.Delete = function(self)
+    for _,v in self.Members do
         v:SetNWInt('gsquads::squad',0)
     end
     -- for other stuff later in the script
@@ -54,25 +55,21 @@ function gsquads.Squads.CanJoin(ply,squad)
 end
 
 function gsquads.Squads:CreateNew(creator)
-    if self.Config.squads_Maxnum <= self.Count or self: then return false end
+    if self.Config.squads_Maxnum <= self.Count or not self:CanCreate(creator) then return false end
     -- checks here
 
     local newsquad = {}
     setmetatable(newsquad,squad_mt)
-    newsquad + creator -- adds creator into squad (commander by default)
+    local _ = newsquad + creator -- adds creator into squad (commander by default)
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
     self.Count = self.Count + 1
 end
 
-function gsquads.Squads:GetSquadbyCmndName(nick)
-    local cmnd = gsquads.IsPlyNick( nick )
+function gsquads.Squads:GetSquadbyCmnd(cmnd)
     if not cmnd then return false end
-    for squad, tbl in pairs(self.list) do
-        if tbl.Members[tbl.Commander] == cmnd then
-            return squad
-        end
-    end
-    return false
+    local cmnd_squad = cmnd:GetNWInt("gsquads::squad",false)
+    if not cmnd_squad then return false end
+    return self.list[cmnd_squad]
 end
 
 function gsquads.Squads:GetCurSquad(ply)
