@@ -12,7 +12,7 @@ ChatCommands.create = function(ply,text)
     gsquads.Squads:CreateNew(ply)
     return ''
 end
-
+-- todo make help command + descriptions
 ChatCommands.join = function(ply,text)
     local args = string.Explode( ' ', text)
     if #args < 2 then return false end
