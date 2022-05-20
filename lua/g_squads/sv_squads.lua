@@ -5,7 +5,7 @@ include('config/squads_config.lua')
 gsquads.Squads.Count = 0
 gsquads.Squads.list = {}
 
-local squad_mt = {
+local squad_prototype = {
     Members = {},
     Commander = 1,-- indx of commander in members table
     Kills = 0,
@@ -13,31 +13,27 @@ local squad_mt = {
     Faction = 0,
     id = 0
 }
+setmetatable(squad_prototype,{__newindex = function() end}) -- make read-only, just in case i mess up
+
 -- add new player to squad
--- gsquads.Squads.list[n] + ply
+squad_prototype:Join = function(ply)
+    if not IsEntity(ply) or not nply:IsPlayer() then return end
+    table.insert( self.Members, ply )
 
-squad_mt.__add = function(squad, nply)
-    if getmetatable(squad) ~= squad_mt then return end
-    if not IsEntity(nply) or not nply:IsPlayer() then return end
-
-    table.insert( squad.Members, nply )
-
-    return squad.Members
+    return self.Members
 end
 -- remove player from squad
 -- gsquads.Squads.list[n] - ply
-squad_mt.__sub = function(squad, nply)
-    if getmetatable(squad) ~= squad_mt then return end
-    if not IsEntity(nply) or not nply:IsPlayer() then return end
-    if nply == squad.Commander then return false end
-
-    table.RemoveByValue( squad.Members, nply )
-    if #squad.Members<1 then squad:Delete() end
+squad_prototype:Leave = function(ply)
+    if not IsEntity(ply) or not nply:IsPlayer() then return end
+    if ply == self.Commander then return false end
+    table.RemoveByValue( self.Members, ply )
+    if #self.Members == 2 then self.Comander = 1 end
     return true
 end
 
  -- delete the squad
-squad_mt.Delete = function(self)
+ squad_prototype:Delete = function()
     for _,v in self.Members do
         v:SetNWInt('gsquads::squad',0)
     end
@@ -45,24 +41,28 @@ squad_mt.Delete = function(self)
     hook.Run('Gsquads_PreSquadDelete',self)
 end
 
+function gsquads.Squads:CreateNew(creator)
+    if self.Config.squad_Maxnum <= self.Count or not self.CanCreate(creator) then return false end
+
+    local newsquad = {}
+    setmetatable(newsquad,{__index = squad_prototype})
+    local _ = newsquad + creator -- adds creator into squad (commander by default)
+    newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
+    self.Count = self.Count + 1
+end
+
+-- action permission checks here
 function gsquads.Squads.CanCreate(ply)
     if ply:GetNWInt('gsquads::squad',0) ~= 0 then return false end
+    if not gsquads.Squads.Config.CustomCanCreate(ply) then return false end
+    return true
 end
 
 function gsquads.Squads.CanJoin(ply,squad)
     local cursquad = gsquads.Squads.list[squad]
     if gsquads.Factions.jobsToFaction[ply:Team()] ~= cursquad.Faction then return false end
-end
-
-function gsquads.Squads:CreateNew(creator)
-    if self.Config.squads_Maxnum <= self.Count or not self:CanCreate(creator) then return false end
-    -- checks here
-
-    local newsquad = {}
-    setmetatable(newsquad,squad_mt)
-    local _ = newsquad + creator -- adds creator into squad (commander by default)
-    newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
-    self.Count = self.Count + 1
+    if not gsquads.Squads.Config.CustomCanJoin( squad, ply ) then return false end
+    return true
 end
 
 function gsquads.Squads:GetSquadbyCmnd(cmnd)
