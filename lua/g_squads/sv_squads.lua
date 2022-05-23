@@ -1,5 +1,3 @@
-gsquads.Squads = gsquads.Squads or {}
-
 include('config/squads_config.lua')
 
 gsquads.Squads.Count = 0

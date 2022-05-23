@@ -1,4 +1,3 @@
-gsquads.Factions = gsquads.Factions or {}
 gsquads.Factions.list = gsquads.Factions.list or { [ 1 ] = {
     Name = 'No Faction',
     TeamsTable = nil, 
