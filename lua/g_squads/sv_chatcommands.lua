@@ -1,6 +1,9 @@
 local commandprefix = '/squad'
 local ChatCommands = {}
+-- todo make help command + descriptions
 
+
+-- creates new squad
 ChatCommands.create = function(ply,text)
     local args = string.Explode( ' ', text)
     if #args < 1 then return false end
@@ -12,7 +15,7 @@ ChatCommands.create = function(ply,text)
     gsquads.Squads:CreateNew(ply)
     return ''
 end
--- todo make help command + descriptions
+-- join squad. in : commander name
 ChatCommands.join = function(ply,text)
     local args = string.Explode( ' ', text)
     if #args < 2 then return false end
@@ -39,7 +42,7 @@ ChatCommands.join = function(ply,text)
     return ''
 end
 
---? decide how to leave a squad, doesnt work atm
+--leave current squad
 ChatCommands.leave = function(ply,text)
     --local args = string.Explode( ' ', text)
 
