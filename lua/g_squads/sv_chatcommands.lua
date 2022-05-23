@@ -1,20 +1,16 @@
 local commandprefix = '/squad'
 local ChatCommands = ChatCommands or {}
 local ComandDescs = ComandDescs or {}
--- todo make help command + descriptions
-
 
 -- creates new squad
 ComandDescs.create = 'create : Creates a new squad. [no args]'
 ChatCommands.create = function(ply,text)
-    local args = string.Explode( ' ', text)
-    if #args < 1 then return false end
+    print('check0')
     if not gsquads.Squads.CanCreate(ply) then
         ply:ChatPrint('You cannot create a squad at this time.')
         return ''
     end
-
-    gsquads.Squads:CreateNew(ply)
+    gsquads.Squads.CreateNew(ply)
     return ''
 end
 -- join squad. in : commander name
@@ -64,20 +60,26 @@ ComandDescs.help = 'help : prints information about all chatcommands in this scr
 ChatCommands.help = function(ply,_)
     ply:ChatPrint('gSquads chatcommands help : all commands below.')
     for _,v in pairs(ComandDescs) do
-        ply:ChatPrint(v)
+        ply:ChatPrint( '\t' .. v )
     end
+    return ''
 end
 
 local plyCooldowns = plyCooldowns or {}
-local cooldown = 200 --ms 
+local cooldown = .200 --ms 
 hook.Add('PlayerSay','gsquads::PlayerSay',function(ply,text_o,tmch)
     text = text_o
     if not string.StartWith( text, commandprefix ) then return end
     if plyCooldowns[ply] and CurTime() - plyCooldowns[ply] < cooldown then ply:ChatPrint('Please wait 200ms between comands') return end
     plyCooldowns[ply] = CurTime()
+
+    if text == commandprefix  then
+        return ChatCommands.help(ply,'')
+    end
+
     text = string.TrimLeft(text,commandprefix)
     text = string.TrimLeft(text,' ')
-
+    
     for k,fnc in pairs(ChatCommands) do
         if string.StartWith(text,k) then
             return (fnc( ply, string.TrimLeft(text,k) ) or text_o)

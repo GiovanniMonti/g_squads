@@ -9,20 +9,21 @@ local squad_prototype = {
     Kills = 0,
     Deaths = 0,
     Faction = 0,
-    id = 0
+    id = 0,
+    
 }
-setmetatable(squad_prototype,{__newindex = function() end}) -- make read-only, just in case i mess up
+squad_prototype.__index = squad_prototype
 
 -- add new player to squad
-squad_prototype:Join = function(ply)
-    if not IsEntity(ply) or not nply:IsPlayer() then return end
+function squad_prototype:Join(ply)
+    if not IsEntity(ply) or not ply:IsPlayer() then return end
     table.insert( self.Members, ply )
 
     return self.Members
 end
+
 -- remove player from squad
--- gsquads.Squads.list[n] - ply
-squad_prototype:Leave = function(ply)
+function squad_prototype:Leave(ply)
     if not IsEntity(ply) or not nply:IsPlayer() then return end
     if ply == self.Commander then return false end
     table.RemoveByValue( self.Members, ply )
@@ -31,7 +32,7 @@ squad_prototype:Leave = function(ply)
 end
 
  -- delete the squad
- squad_prototype:Delete = function()
+function squad_prototype:Delete()
     for _,v in self.Members do
         v:SetNWInt('gsquads::squad',0)
     end
@@ -39,14 +40,18 @@ end
     hook.Run('Gsquads_PreSquadDelete',self)
 end
 
-function gsquads.Squads:CreateNew(creator)
-    if self.Config.squad_Maxnum <= self.Count or not self.CanCreate(creator) then return false end
+function gsquads.Squads.CreateNew(creator)
+    if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
     local newsquad = {}
-    setmetatable(newsquad,{__index = squad_prototype})
-    local _ = newsquad + creator -- adds creator into squad (commander by default)
+    setmetatable( newsquad, squad_prototype )
+    newsquad:Join( creator ) -- adds creator into squad (commander by default)
+
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
-    self.Count = self.Count + 1
+    if not table.insert( gsquads.Squads.list, newsquad ) then
+        print('GSQUADS : CRITICAL ERROR IN SQUAD CREATION')
+    end
+    gsquads.Squads.Count = gsquads.Squads.Count + 1
 end
 
 -- action permission checks here
