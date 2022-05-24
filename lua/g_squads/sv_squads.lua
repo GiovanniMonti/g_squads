@@ -3,15 +3,7 @@ include('config/squads_config.lua')
 gsquads.Squads.Count = 0
 gsquads.Squads.list = {}
 
-local squad_prototype = {
-    Members = {},
-    Commander = 1,-- indx of commander in members table
-    Kills = 0,
-    Deaths = 0,
-    Faction = 0,
-    id = 0,
-    
-}
+local squad_prototype = {}
 squad_prototype.__index = squad_prototype
 
 -- add new player to squad
@@ -43,7 +35,14 @@ end
 function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
-    local newsquad = {}
+    local newsquad = {
+        Members = {},
+        Commander = 1, -- indx of commander in members table
+        Kills = 0,
+        Deaths = 0,
+        Faction = 0,
+        id = 0,
+    }
     setmetatable( newsquad, squad_prototype )
     newsquad:Join( creator ) -- adds creator into squad (commander by default)
 
