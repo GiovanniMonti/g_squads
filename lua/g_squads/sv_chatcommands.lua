@@ -5,19 +5,30 @@ local ComandDescs = ComandDescs or {}
 -- creates new squad
 ComandDescs.create = 'create : Creates a new squad. [no args]'
 ChatCommands.create = function(ply,text)
-    print('check0')
+    --print('check0')
+    if gsquads.Squads.GetCurSquad(ply) then
+        ply:ChatPrint('You are already in a squad.')
+        return ''
+    end
+
     if not gsquads.Squads.CanCreate(ply) then
         ply:ChatPrint('You cannot create a squad at this time.')
         return ''
     end
-    gsquads.Squads.CreateNew(ply)
+    local squad = gsquads.Squads.CreateNew(ply)
+    ply:ChatPrint('Created squad.')
     return ''
 end
 -- join squad. in : commander name
 ComandDescs.join = 'join : Joins the selected squad. [name/steamid of squad commander]'
 ChatCommands.join = function(ply,text)
+
     local args = string.Explode( ' ', text)
-    if #args < 2 then return false end
+    if #args < 2 then 
+        ply:ChatPrint('Error. command usage : /squad join <commander_name>')
+        return '' 
+    end
+
     local comander = gsquads.IsPlyNick( args[1] )
     local squadJoining = gsquads.Squads:GetSquadbyCmnd(comander)
 
@@ -36,7 +47,7 @@ ChatCommands.join = function(ply,text)
         return ''
     end
     
-    local _ = gsquads.Squads.list[ ply:GetNWInt(cursquad) ] + ply
+    squadJoining:Join(ply)
 
     return ''
 end
@@ -46,13 +57,14 @@ ComandDescs.leave = 'leave : Leaves the current squad. [no args]'
 ChatCommands.leave = function(ply,text)
     --local args = string.Explode( ' ', text)
 
-    local cursquad =  ply:GetNWInt('gsquads::squad')
-
-    if not cursquad or cursquad == 0 then 
-        ply:ChatPrint('You are not in squad.')
-        return false
+    local cursquad = gsquads.Squads.GetCurSquad(ply)
+    print(cursquad)
+    if not cursquad then 
+        ply:ChatPrint('You are not in a squad.')
+        return ''
     end
-    local _ = gsquads.Squads.list[ ply:GetNWInt(cursquad) ] - ply
+
+    cursquad:Leave(ply)
 
     return ''
 end

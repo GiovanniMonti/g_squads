@@ -10,13 +10,13 @@ squad_prototype.__index = squad_prototype
 function squad_prototype:Join(ply)
     if not IsEntity(ply) or not ply:IsPlayer() then return end
     table.insert( self.Members, ply )
-
+    ply:SetNWInt('gsquads::squad',self.id)
     return self.Members
 end
 
 -- remove player from squad
 function squad_prototype:Leave(ply)
-    if not IsEntity(ply) or not nply:IsPlayer() then return end
+    if not IsEntity(ply) or not ply:IsPlayer() then return end
     if ply == self.Commander then return false end
     table.RemoveByValue( self.Members, ply )
     if #self.Members == 2 then self.Comander = 1 end
@@ -44,13 +44,18 @@ function gsquads.Squads.CreateNew(creator)
         id = 0,
     }
     setmetatable( newsquad, squad_prototype )
-    newsquad:Join( creator ) -- adds creator into squad (commander by default)
-
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
-    if not table.insert( gsquads.Squads.list, newsquad ) then
+    newsquad.id = table.insert( gsquads.Squads.list, newsquad )
+
+    if not newsquad.id then
         print('GSQUADS : CRITICAL ERROR IN SQUAD CREATION')
     end
+    newsquad:Join( creator ) -- adds creator into squad (commander by default)
+
     gsquads.Squads.Count = gsquads.Squads.Count + 1
+
+    --creator:SetNWInt('gsquads::squad',newsquad.id)
+    return newsquad
 end
 
 -- action permission checks here
@@ -74,6 +79,8 @@ function gsquads.Squads:GetSquadbyCmnd(cmnd)
     return self.list[cmnd_squad]
 end
 
-function gsquads.Squads:GetCurSquad(ply)
-    return ply:GetNWInt('gsquads::squad',0)
+function gsquads.Squads.GetCurSquad(ply)
+    local indx = ply:GetNWInt("gsquads::squad",false)
+    if not indx then return false end
+    return gsquads.Squads.list[ indx ]
 end
