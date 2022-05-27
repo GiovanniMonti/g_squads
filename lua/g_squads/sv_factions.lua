@@ -20,13 +20,15 @@ function gsquads.Factions:CreateNew( name, WhitelistTeams, Tcolor )
 end
 
 function gsquads.Factions.GetTable(idx)
+    if not gsquads.Factions.Config.Toggle then return gsquads.Factions.list[1] end
     if not isnumber(idx) then return false end
     return gsquads.Factions.list[idx]
 end
 
 function gsquads.Factions.GetFaction(job)
+    if not gsquads.Factions.Config.Toggle then return 1 end
     if not isnumber(job) or not RPExtraTeams[job] then return false end
-    return gsquads.Factions.jobsToFaction[job] or 0
+    return gsquads.Factions.jobsToFaction[job] or 1
 end
 
 hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp',function()

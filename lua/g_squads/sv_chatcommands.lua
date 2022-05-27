@@ -37,17 +37,9 @@ ChatCommands.join = function(ply,text)
         return ''
     end
 
-    if table.HasValue( squadJoining.list, ply ) then
-        ply:ChatPrint('You are already in this squad!')
-        return ''
+    if squadJoining:Join(ply) then
+        ply:ChatPrint('You have joined the squad.')
     end
-
-    if not gsquads.Squads.CanJoin(ply,squadJoining) then
-        ply:ChatPrint('You cannot join this squad at this time.')
-        return ''
-    end
-    
-    squadJoining:Join(ply)
 
     return ''
 end
@@ -58,13 +50,14 @@ ChatCommands.leave = function(ply,text)
     --local args = string.Explode( ' ', text)
 
     local cursquad = gsquads.Squads.GetCurSquad(ply)
-    print(cursquad)
+    PrintTable(cursquad)
     if not cursquad then 
         ply:ChatPrint('You are not in a squad.')
         return ''
     end
 
     cursquad:Leave(ply)
+    ply:ChatPrint('You have left the squad.')
 
     return ''
 end

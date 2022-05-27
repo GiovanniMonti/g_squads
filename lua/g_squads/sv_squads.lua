@@ -8,9 +8,22 @@ squad_prototype.__index = squad_prototype
 
 -- add new player to squad
 function squad_prototype:Join(ply)
-    if not IsEntity(ply) or not ply:IsPlayer() then return end
-    table.insert( self.Members, ply )
+    if not ply:IsPlayer() then return end
+        
+    if table.HasValue( self.Members, ply ) then
+        ply:ChatPrint('You are already in this squad!')
+        return false
+    end
+
+    if not gsquads.Squads.CanJoin(ply,self) then
+        ply:ChatPrint('You cannot join this squad at this time.')
+        return false
+    end
+
+    if not table.insert( self.Members, ply ) then return false end
+
     ply:SetNWInt('gsquads::squad',self.id)
+
     return self.Members
 end
 
@@ -66,8 +79,7 @@ function gsquads.Squads.CanCreate(ply)
 end
 
 function gsquads.Squads.CanJoin(ply,squad)
-    local cursquad = gsquads.Squads.list[squad]
-    if gsquads.Factions.jobsToFaction[ply:Team()] ~= cursquad.Faction then return false end
+    if gsquads.Factions.Config.Toggle and gsquads.Factions.jobsToFaction[ply:Team()] ~= squad.Faction then return false end
     if not gsquads.Squads.Config.CustomCanJoin( squad, ply ) then return false end
     return true
 end
