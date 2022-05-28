@@ -1,3 +1,5 @@
+include('config/factions_config.lua')
+
 gsquads.Factions.list = gsquads.Factions.list or { [ 1 ] = {
     Name = 'No Faction',
     TeamsTable = nil, 

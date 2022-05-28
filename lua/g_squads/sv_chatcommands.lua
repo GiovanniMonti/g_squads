@@ -5,7 +5,6 @@ local ComandDescs = ComandDescs or {}
 -- creates new squad
 ComandDescs.create = 'create : Creates a new squad. [no args]'
 ChatCommands.create = function(ply,text)
-    --print('check0')
     if gsquads.Squads.GetCurSquad(ply) then
         ply:ChatPrint('You are already in a squad.')
         return ''
@@ -47,10 +46,8 @@ end
 --leave current squad
 ComandDescs.leave = 'leave : Leaves the current squad. [no args]'
 ChatCommands.leave = function(ply,text)
-    --local args = string.Explode( ' ', text)
-
     local cursquad = gsquads.Squads.GetCurSquad(ply)
-    PrintTable(cursquad)
+
     if not cursquad then 
         ply:ChatPrint('You are not in a squad.')
         return ''
