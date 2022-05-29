@@ -66,6 +66,24 @@ ChatCommands.help = function(ply,_)
     end
     return ''
 end
+ComandDescs.info = 'info : prints information about the current squad. [no args]'
+ChatCommands.info = function(ply,_)
+    local squad = gsquads.Squads.GetCurSquad(ply)
+    if not squad then ply:ChatPrint('You are not in a squad.') return '' end
+    local chpr = ply.ChatPrint
+    chpr(ply,'Current squad information :')
+    chpr(ply,'\tMembers:')
+    for _, pl in pairs(squad.Members) do
+        chpr(ply, '\t\t' .. pl:Nick() )
+    end
+    chpr(ply,'\tCommander: ' .. squad.Members[squad.Commander]:Nick())
+    chpr(ply,'\tKills: ' .. squad.Kills)
+    chpr(ply,'\tDeaths: ' .. squad.Deaths)
+    chpr(ply,'\tFaction [debugging] : '.. squad.Faction)
+    chpr(ply,'\tid [debugging] : ' .. squad.id)
+    return ''
+end
+
 
 local plyCooldowns = plyCooldowns or {}
 local cooldown = .200 --ms 

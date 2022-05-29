@@ -1,5 +1,3 @@
-include('config/factions_config.lua')
-
 gsquads.Factions.list = gsquads.Factions.list or { [ 1 ] = {
     Name = 'No Faction',
     TeamsTable = nil, 
@@ -33,10 +31,6 @@ function gsquads.Factions.GetFaction(job)
     return gsquads.Factions.jobsToFaction[job] or 1
 end
 
-hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp',function()
-    include('config/factions_config.lua')
-end)
-
 hook.Add('PlayerChangedTeam','gsquads::PlayerChangedTeam',function(ply,oteam,nteam)
     local ofac = gsquads.Factions.GetFaction(oteam) or 0
     local nfac = gsquads.Factions.GetFaction(nteam)
@@ -44,3 +38,4 @@ hook.Add('PlayerChangedTeam','gsquads::PlayerChangedTeam',function(ply,oteam,nte
     -- hook into here for custom prints and such
     hook.Run('GsquadsPlayerChangedFaction', ply, ofac, nfac) 
 end)
+include('config/factions_config.lua')
