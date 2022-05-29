@@ -29,10 +29,12 @@ end
 
 -- remove player from squad
 function squad_prototype:Leave(ply)
-    if not IsEntity(ply) or not ply:IsPlayer() then return end
     if ply == self.Commander then return false end
     table.RemoveByValue( self.Members, ply )
-    if #self.Members == 2 then self.Comander = 1 end
+    ply:SetNWInt('gsquads::squad',0)
+    if #self.Members == 1 then
+        self.Commander = 1
+    end
     return true
 end
 
@@ -96,3 +98,14 @@ function gsquads.Squads.GetCurSquad(ply)
     if not indx then return false end
     return gsquads.Squads.list[ indx ]
 end
+
+hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
+    local vicsquad = gsquads.Squads.GetCurSquad(victim)
+    local attsquad = gsquads.Squads.GetCurSquad(attacker)
+    if vicsquad then
+        vicsquad.Deaths = vicsquad.Deaths + 1
+    end
+    if attsquad and ( gsquads.Squads.Config.count_teamkill or attsquad ~= vicsquad) then
+        attsquad.Kills = attsquad.Kills + 1
+    end
+end)
