@@ -40,8 +40,10 @@ end
 
  -- delete the squad
 function squad_prototype:Delete()
-    for _,v in self.Members do
-        v:SetNWInt('gsquads::squad',0)
+    if #self.Members > 0 then
+        for _,v in self.Members do
+            v:SetNWInt('gsquads::squad',0)
+        end
     end
     -- for other stuff later in the script
     hook.Run('Gsquads_PreSquadDelete',self)
