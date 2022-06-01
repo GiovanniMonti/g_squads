@@ -103,23 +103,17 @@ function gsquads.Squads.GetCurSquad(ply)
     return gsquads.Squads.list[ indx ]
 end
 
-<<<<<<< HEAD
 function gsquads.Squads.UpdateClient(ply)
     local sqd = gsquads.Squads.GetCurSquad(ply)
     net.Start("gsquads::openhud")
     net.WriteString()
     net.Send(ply)
-
+end
 util.AddNetworkString("gsquads::openhud")
-hool.Add("Gsquads_SquadJoin",function(sqd,ply)
+hook.Add("Gsquads_SquadJoin",function(sqd,ply)
 
-    if not gsquads.Squads.Config.EnableHUD then
-        return
-    end
-
+end)
     
-    
-=======
 hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
     local vicsquad = gsquads.Squads.GetCurSquad(victim)
     local attsquad = gsquads.Squads.GetCurSquad(attacker)
@@ -129,5 +123,4 @@ hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
     if attsquad and ( gsquads.Squads.Config.count_teamkill or attsquad ~= vicsquad) then
         attsquad.Kills = attsquad.Kills + 1
     end
->>>>>>> cf4393420d2846d1d08e0343eb2e8c658b9a75cf
 end)
