@@ -31,17 +31,21 @@ end
 
 -- remove player from squad
 function squad_prototype:Leave(ply)
-    if not IsEntity(ply) or not ply:IsPlayer() then return end
     if ply == self.Commander then return false end
     table.RemoveByValue( self.Members, ply )
-    if #self.Members == 2 then self.Comander = 1 end
+    ply:SetNWInt('gsquads::squad',0)
+    if #self.Members == 1 then
+        self.Commander = 1
+    end
     return true
 end
 
  -- delete the squad
 function squad_prototype:Delete()
-    for _,v in self.Members do
-        v:SetNWInt('gsquads::squad',0)
+    if #self.Members > 0 then
+        for _,v in self.Members do
+            v:SetNWInt('gsquads::squad',0)
+        end
     end
     -- for other stuff later in the script
     hook.Run('Gsquads_PreSquadDelete',self)
@@ -99,6 +103,7 @@ function gsquads.Squads.GetCurSquad(ply)
     return gsquads.Squads.list[ indx ]
 end
 
+<<<<<<< HEAD
 function gsquads.Squads.UpdateClient(ply)
     local sqd = gsquads.Squads.GetCurSquad(ply)
     net.Start("gsquads::openhud")
@@ -114,4 +119,15 @@ hool.Add("Gsquads_SquadJoin",function(sqd,ply)
 
     
     
+=======
+hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
+    local vicsquad = gsquads.Squads.GetCurSquad(victim)
+    local attsquad = gsquads.Squads.GetCurSquad(attacker)
+    if vicsquad then
+        vicsquad.Deaths = vicsquad.Deaths + 1
+    end
+    if attsquad and ( gsquads.Squads.Config.count_teamkill or attsquad ~= vicsquad) then
+        attsquad.Kills = attsquad.Kills + 1
+    end
+>>>>>>> cf4393420d2846d1d08e0343eb2e8c658b9a75cf
 end)
