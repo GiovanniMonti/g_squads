@@ -23,6 +23,8 @@ function squad_prototype:Join(ply)
     if not table.insert( self.Members, ply ) then return false end
 
     ply:SetNWInt('gsquads::squad',self.id)
+    
+    hook.Run('Gsquads_SquadJoin', self , ply )
 
     return self.Members
 end
@@ -49,6 +51,7 @@ function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
     local newsquad = {
+        Name = ''
         Members = {},
         Commander = 1, -- indx of commander in members table
         Kills = 0,
@@ -66,8 +69,7 @@ function gsquads.Squads.CreateNew(creator)
     newsquad:Join( creator ) -- adds creator into squad (commander by default)
 
     gsquads.Squads.Count = gsquads.Squads.Count + 1
-
-    --creator:SetNWInt('gsquads::squad',newsquad.id)
+    -- todo set squad name
     return newsquad
 end
 
@@ -96,3 +98,20 @@ function gsquads.Squads.GetCurSquad(ply)
     if not indx then return false end
     return gsquads.Squads.list[ indx ]
 end
+
+function gsquads.Squads.UpdateClient(ply)
+    local sqd = gsquads.Squads.GetCurSquad(ply)
+    net.Start("gsquads::openhud")
+    net.WriteString()
+    net.Send(ply)
+
+util.AddNetworkString("gsquads::openhud")
+hool.Add("Gsquads_SquadJoin",function(sqd,ply)
+
+    if not gsquads.Squads.Config.EnableHUD then
+        return
+    end
+
+    
+    
+end)

@@ -13,7 +13,8 @@ gsquads.Squads.Config = gsquads.Squads.Config or {
     },
 
     squad_Maxsize = 4,
-    squad_Maxnum = 10
+    squad_Maxnum = 10,
+    EnableHUD = true,
 }
 
 function gsquads.Squads.Config.CustomCanCreate( ply )
