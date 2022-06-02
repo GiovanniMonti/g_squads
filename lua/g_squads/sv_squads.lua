@@ -37,6 +37,8 @@ function squad_prototype:Leave(ply)
     if #self.Members == 1 then
         self.Commander = 1
     end
+    hook.Run('Gsquads_SquadLeave', self , ply )
+
     return true
 end
 
@@ -103,15 +105,66 @@ function gsquads.Squads.GetCurSquad(ply)
     return gsquads.Squads.list[ indx ]
 end
 
-function gsquads.Squads.UpdateClient(ply)
-    local sqd = gsquads.Squads.GetCurSquad(ply)
-    net.Start("gsquads::openhud")
-    net.WriteString()
-    net.Send(ply)
-end
-util.AddNetworkString("gsquads::openhud")
-hook.Add("Gsquads_SquadJoin",function(sqd,ply)
 
+
+
+util.AddNetworkString("gsquads::openhud")
+util.AddNetworkString("gsquads::updateInfo")
+util.AddNetworkString("gsquads::parUpdateInfo")
+
+function gsquads.Squads.UpdateClient( ply, sqd )
+    local sqd = sqd or gsquads.Squads.GetCurSquad( ply )
+
+    net.Start( "gsquads::updateInfo" )
+    net.WriteBool(true)
+    net.WriteString( sqd.Name )
+    net.WriteUInt( sqd.Kills, 16 )
+    net.WriteUInt( sqd.Deaths, 16 )
+    net.WriteUInt( sqd.Faction, 8 )
+    net.WriteUInt( sqd.Commander, 8 )
+    net.WriteUInt( #sqd.Members, 8 )
+
+    for _,v in ipairs( sqd.Members ) do
+        net.WriteString( v:Nick() )
+        --* write any additional information about players here
+    end
+    
+    net.Send( ply )
+end
+
+function gsquads.Squads.UpdateStats(sqd)
+    net.Start( "gsquads::parUpdateInfo" )
+    net.WriteUInt( sqd.Kills, 16 )
+    net.WriteUInt( sqd.Deaths, 16 )
+    net.Send(sqd.Members)
+end
+
+function gsquads.Squads.ClearClient( ply )
+    net.Start( "gsquads::updateInfo" )
+    net.WriteBool(false)
+    net.Send( ply )
+end
+
+function gsquads.Squads.StartClientHud( ply )
+    net.Start( "gsquads::openhud" )
+    net.WriteBool( true )
+    net.Send( ply )
+end
+
+function gsquads.Squads.StopClientHud( ply )
+    net.Start( "gsquads::openhud" )
+    net.WriteBool( false )
+    net.Send( ply )
+end
+
+hook.Add("Gsquads_SquadJoin",function( sqd, ply )
+    gsquads.Squads.UpdateClient( ply, sqd )
+    gsquads.Squads.StartClientHud( ply )
+end)
+
+hook.Add("Gsquads_SquadLeave",function( sqd, ply )
+    gsquads.Squads.ClearClient( ply )
+    gsquads.Squads.StopClientHud( ply )
 end)
     
 hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
@@ -119,8 +172,10 @@ hook.Add("PlayerDeath", "Gsquads::plydeath", function( victim, _, attacker )
     local attsquad = gsquads.Squads.GetCurSquad(attacker)
     if vicsquad then
         vicsquad.Deaths = vicsquad.Deaths + 1
+        gsquads.Squads.UpdateStats(vicsquad)
     end
     if attsquad and ( gsquads.Squads.Config.count_teamkill or attsquad ~= vicsquad) then
         attsquad.Kills = attsquad.Kills + 1
+        gsquads.Squads.UpdateStats(attsquad)
     end
 end)
