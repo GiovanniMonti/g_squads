@@ -129,7 +129,6 @@ function gsquads.Squads.UpdateClient( ply, sqd )
         net.WriteString( v:Nick() )
         --* write any additional information about players here
     end
-    
     net.Send( ply )
 end
 
@@ -147,18 +146,18 @@ function gsquads.Squads.ClearClient( ply )
 end
 
 function gsquads.Squads.StartClientHud( ply )
-    net.Start( "gsquads::openhud" )
+    net.Start( "gsquads::openhud", true )
     net.WriteBool( true )
     net.Send( ply )
 end
 
 function gsquads.Squads.StopClientHud( ply )
-    net.Start( "gsquads::openhud" )
+    net.Start( "gsquads::openhud", true )
     net.WriteBool( false )
     net.Send( ply )
 end
 
-hook.Add("Gsquads_SquadJoin",'ClientInfo',function( sqd, ply )
+hook.Add("Gsquads_SquadJoin",'ClientInfo', function( sqd, ply )
     gsquads.Squads.UpdateClient( ply, sqd )
     gsquads.Squads.StartClientHud( ply )
 end)
