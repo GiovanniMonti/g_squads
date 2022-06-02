@@ -1,7 +1,7 @@
 include('config/squads_config.lua')
 
-gsquads.Squads.Count = 0
-gsquads.Squads.list = {}
+gsquads.Squads.Count = gsquads.Squads.Count or 0
+gsquads.Squads.list = gsquads.Squads.list or {}
 
 local squad_prototype = {}
 squad_prototype.__index = squad_prototype
@@ -38,26 +38,26 @@ function squad_prototype:Leave(ply)
         self.Commander = 1
     end
     hook.Run('Gsquads_SquadLeave', self , ply )
-
     return true
 end
 
  -- delete the squad
 function squad_prototype:Delete()
     if #self.Members > 0 then
-        for _,v in self.Members do
+        for _,v in ipairs(self.Members) do
             v:SetNWInt('gsquads::squad',0)
         end
     end
     -- for other stuff later in the script
     hook.Run('Gsquads_PreSquadDelete',self)
+    table.remove(gsquads.Squads.list, self.id)
 end
 
 function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
     local newsquad = {
-        Name = ''
+        Name = '',
         Members = {},
         Commander = 1, -- indx of commander in members table
         Kills = 0,
@@ -72,10 +72,12 @@ function gsquads.Squads.CreateNew(creator)
     if not newsquad.id then
         print('GSQUADS : CRITICAL ERROR IN SQUAD CREATION')
     end
+
+    -- todo set squad name
+
     newsquad:Join( creator ) -- adds creator into squad (commander by default)
 
     gsquads.Squads.Count = gsquads.Squads.Count + 1
-    -- todo set squad name
     return newsquad
 end
 
@@ -107,7 +109,6 @@ end
 
 
 
-
 util.AddNetworkString("gsquads::openhud")
 util.AddNetworkString("gsquads::updateInfo")
 util.AddNetworkString("gsquads::parUpdateInfo")
@@ -133,14 +134,14 @@ function gsquads.Squads.UpdateClient( ply, sqd )
 end
 
 function gsquads.Squads.UpdateStats(sqd)
-    net.Start( "gsquads::parUpdateInfo" )
+    net.Start( "gsquads::parUpdateInfo", true )
     net.WriteUInt( sqd.Kills, 16 )
     net.WriteUInt( sqd.Deaths, 16 )
     net.Send(sqd.Members)
 end
 
 function gsquads.Squads.ClearClient( ply )
-    net.Start( "gsquads::updateInfo" )
+    net.Start( "gsquads::updateInfo", true )
     net.WriteBool(false)
     net.Send( ply )
 end
@@ -157,12 +158,13 @@ function gsquads.Squads.StopClientHud( ply )
     net.Send( ply )
 end
 
-hook.Add("Gsquads_SquadJoin",function( sqd, ply )
+hook.Add("Gsquads_SquadJoin",'ClientInfo',function( sqd, ply )
     gsquads.Squads.UpdateClient( ply, sqd )
     gsquads.Squads.StartClientHud( ply )
 end)
 
-hook.Add("Gsquads_SquadLeave",function( sqd, ply )
+hook.Add("Gsquads_SquadLeave",'ClientInfo',function( sqd, ply )
+
     gsquads.Squads.ClearClient( ply )
     gsquads.Squads.StopClientHud( ply )
 end)
