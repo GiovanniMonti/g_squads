@@ -43,13 +43,14 @@ end
 
  -- delete the squad
 function squad_prototype:Delete()
+    hook.Run('Gsquads_PreSquadDelete',self)
     if #self.Members > 0 then
         for _,v in ipairs(self.Members) do
             v:SetNWInt('gsquads::squad',0)
+            hook.Run('Gsquads_SquadLeave', self , v )
         end
     end
     -- for other stuff later in the script
-    hook.Run('Gsquads_PreSquadDelete',self)
     table.remove(gsquads.Squads.list, self.id)
 end
 

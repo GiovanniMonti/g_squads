@@ -1,14 +1,14 @@
 local squadInfo = squadInfo or {}
 
 net.Receive( "gsquads::updateInfo", function()
-    // ClearClient uses same netstring but only clears the table.
+    -- ClearClient uses same netstring but only clears the table.
 
     if net.ReadBool() == false then 
         squadInfo = {} 
         return 
     end
 
-    //UpdateCient
+    --UpdateCient
     squadInfo.Name      =   net.ReadString()
     squadInfo.Kills     =   net.ReadUInt( 16 )
     squadInfo.Deaths    =   net.ReadUInt( 16 )
@@ -30,28 +30,39 @@ net.Receive( "gsquads::parUpdateInfo", function()
 end)
 
 local w,h = ScrW(), ScrH()
-local leftGap, topGap = w / 384, h / 216
+local leftGap, topGap = w / 192, h / 216
+local dot, crown = Material("dot.png"), Material("crown.png")
 
 local function GsquadsHUD()
-    surface.SetTextColor(209, 209, 209)
-    surface.SetDrawColor( 255,255,255)
+
+    surface.SetTextColor(255, 255, 255)
+    surface.SetDrawColor( 255,0,0)
     surface.SetFont( 'Trebuchet18' )
     surface.SetTextPos(leftGap, topGap)
     surface.DrawText( squadInfo.Name .. ' Squad:')
 
-    local textW = topGap
+    local textW = leftGap * 4
+    local textH = topGap + (topGap*5)
+
     for k, name in ipairs(squadInfo.Members) do
 
-        surface.SetTextPos(leftGap, textW)
-        --todo draw a dot before ply name (texture)
-        if k == squadInfo.Commander then
-            --todo draw a different icon or smth idk
+        surface.SetTextPos(textW, textH)
+        
+        if k == squadInfo.Commander then --! commented for debugging
+            surface.SetMaterial(crown)
+            surface.DrawTexturedRect(leftGap,textH-topGap,topGap*5,topGap*5)
+        else
+            surface.SetMaterial(dot)
+            surface.DrawTexturedRect(leftGap,textH-(topGap/2),topGap*5,topGap*5)
         end
 
+        
+
         surface.DrawText(name)
-        textW = textW + topGap
+        textH = textH + (topGap*5)
     end
-    surface.DrawLine(leftGap, textW , leftGap*16, textW  )
+
+    surface.DrawLine(leftGap, textH , leftGap*16, textH  )
 end     
 
 -- wish this could be above
