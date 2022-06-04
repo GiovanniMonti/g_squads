@@ -35,34 +35,36 @@ local dot, crown = Material("dot.png"), Material("crown.png")
 
 local function GsquadsHUD()
 
-    surface.SetTextColor(255, 255, 255)
-    surface.SetDrawColor( 255,0,0)
+    local textW = leftGap * 4
+    local textH = topGap + ( topGap*5 )
+
+    surface.SetDrawColor( 90,90,90,182)
+    surface.DrawRect( leftGap, topGap, leftGap*16, textH + ( (topGap*5) * (#squadInfo.Members ) ) )
+
+    surface.SetTextColor(255, 255, 255, 255)
+    surface.SetDrawColor( 255, 0, 0, 255)
     surface.SetFont( 'Trebuchet18' )
-    surface.SetTextPos(leftGap, topGap)
+    surface.SetTextPos( leftGap, topGap )
     surface.DrawText( squadInfo.Name .. ' Squad:')
 
-    local textW = leftGap * 4
-    local textH = topGap + (topGap*5)
 
-    for k, name in ipairs(squadInfo.Members) do
+    for k, name in ipairs( squadInfo.Members ) do
 
-        surface.SetTextPos(textW, textH)
+        surface.SetTextPos( textW, textH )
         
-        if k == squadInfo.Commander then --! commented for debugging
-            surface.SetMaterial(crown)
-            surface.DrawTexturedRect(leftGap,textH-topGap,topGap*5,topGap*5)
+        if k == squadInfo.Commander then
+            surface.SetMaterial( crown )
+            surface.DrawTexturedRect( leftGap, textH-topGap ,topGap*5 ,topGap*5 )
         else
-            surface.SetMaterial(dot)
-            surface.DrawTexturedRect(leftGap,textH-(topGap/2),topGap*5,topGap*5)
+            surface.SetMaterial( dot )
+            surface.DrawTexturedRect( leftGap, textH-(topGap/2), topGap*5, topGap*5 )
         end
 
-        
-
-        surface.DrawText(name)
-        textH = textH + (topGap*5)
+        surface.DrawText( name )
+        textH = textH + ( topGap * 5 )
     end
+    surface.DrawLine( leftGap, textH+topGap , leftGap*17, textH+topGap  )
 
-    surface.DrawLine(leftGap, textH , leftGap*16, textH  )
 end     
 
 -- wish this could be above
