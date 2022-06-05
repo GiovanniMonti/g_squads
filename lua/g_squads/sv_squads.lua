@@ -159,13 +159,13 @@ function gsquads.Squads.StopClientHud( ply )
 end
 
 hook.Add("Gsquads_SquadJoin",'ClientInfo', function( sqd, ply )
-    gsquads.Squads.UpdateClient( ply, sqd )
+    gsquads.Squads.UpdateClient( sqd.Members, sqd )
     gsquads.Squads.StartClientHud( ply )
 end)
 
 hook.Add("Gsquads_SquadLeave",'ClientInfo',function( sqd, ply )
-
     gsquads.Squads.ClearClient( ply )
+    gsquads.Squads.UpdateClient( sqd.Members, sqd )
     gsquads.Squads.StopClientHud( ply )
 end)
     
