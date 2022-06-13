@@ -124,6 +124,14 @@ ChatCommands.info = function(ply,_)
     return ''
 end
 
+ComandDescs.gui = 'opens the gsquads GUI [no args]'
+ChatCommands.gui = function(ply,_)
+
+    net.Start('gsquads::opengui')
+    net.Send(ply)
+
+end
+
 
 local plyCooldowns = plyCooldowns or {}
 local cooldown = .200 --ms 

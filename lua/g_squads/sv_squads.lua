@@ -108,11 +108,13 @@ function gsquads.Squads.GetCurSquad(ply)
     return gsquads.Squads.list[ indx ]
 end
 
-
-
 util.AddNetworkString("gsquads::openhud")
 util.AddNetworkString("gsquads::updateInfo")
 util.AddNetworkString("gsquads::parUpdateInfo")
+
+util.AddNetworkString("gsquads::opengui")
+util.AddNetworkString("gsquads::updategui")
+
 
 function gsquads.Squads.UpdateClient( ply, sqd )
     local sqd = sqd or gsquads.Squads.GetCurSquad( ply )

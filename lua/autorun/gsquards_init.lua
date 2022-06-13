@@ -14,8 +14,8 @@ hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp', function()
             end
             return false
         end
-
     end
+    
     if SERVER then
         loadExtraFunctions()
         gsquads.Factions = gsquads.Factions or {}
@@ -27,6 +27,8 @@ hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp', function()
         include("g_squads/sv_chatcommands.lua")
 
         AddCSLuaFile("g_squads/cl_squads.lua")
+        AddCSLuaFile("g_squads/cl_squads_gui.lua")
+
         print([[
         ---------------------------------
         ---------------------------------
@@ -37,7 +39,10 @@ hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp', function()
     end
 
     if CLIENT then
+
         include("g_squads/cl_squads.lua")
+        include("g_squads/cl_squads_gui.lua")
+
         print([[
         ---------------------------------
         ---------------------------------
