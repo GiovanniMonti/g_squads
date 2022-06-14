@@ -50,3 +50,9 @@ net.Receive('gsquads::opengui', function ()
     openGui()
     
 end)
+
+net.Receive('gsquads::updategui', function()
+
+
+    
+end)

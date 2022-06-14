@@ -160,6 +160,14 @@ function gsquads.Squads.StopClientHud( ply )
     net.Send( ply )
 end
 
+function gsquads.Squads.UpdateGUI( ply )
+
+    --net.Start('gsquads::updategui')
+    
+    --net.Send(ply)
+
+end
+
 hook.Add("Gsquads_SquadJoin",'ClientInfo', function( sqd, ply )
     gsquads.Squads.UpdateClient( sqd.Members, sqd )
     gsquads.Squads.StartClientHud( ply )
