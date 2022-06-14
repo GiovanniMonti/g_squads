@@ -96,6 +96,23 @@ ChatCommands.delete = function(ply,text)
     return ''
 end
 
+ComandDescs.lock = 'makes the squad private [no args]'
+ChatCommands.lock = function(ply,_)
+
+    local cursquad = gsquads.Squads.GetCurSquad(ply)
+
+    if not cursquad then 
+        ply:ChatPrint('You are not in a squad.')
+        return ''
+    end
+
+    if cursquad.Members[cursquad.Commander] ~= ply then
+        ply:ChatPrint('You are not the squad commander.')
+        return ''
+    end
+
+end
+
 -- get info about addon's commands
 ComandDescs.help = 'help : prints information about all chatcommands in this script. [no args]'
 ChatCommands.help = function(ply,_)
