@@ -15,6 +15,11 @@ function squad_prototype:Join(ply)
         return false
     end
 
+    if self.state == squad_States.private then
+        ply:ChatPrint('Request Sent.')
+        self:RequestJoin( ply )
+    end
+
     if not gsquads.Squads.CanJoin(ply,self) then
         ply:ChatPrint('You cannot join this squad at this time.')
         return false
@@ -54,6 +59,20 @@ function squad_prototype:Delete()
     table.remove(gsquads.Squads.list, self.id)
 end
 
+function squad_prototype:RequestJoin(ply)
+    -- chat/gui asks
+    -- 30s timeout
+    -- deny/accept
+end
+
+local squad_States = { 
+
+    ['public'] = 1,
+    ['private'] = 2,
+    ['locked'] = 3,
+
+}
+
 function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
@@ -65,6 +84,7 @@ function gsquads.Squads.CreateNew(creator)
         Deaths = 0,
         Faction = 0,
         id = 0,
+        state = squad_States.public
     }
     setmetatable( newsquad, squad_prototype )
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
@@ -92,6 +112,8 @@ end
 function gsquads.Squads.CanJoin(ply,squad)
     if gsquads.Factions.Config.Toggle and gsquads.Factions.jobsToFaction[ply:Team()] ~= squad.Faction then return false end
     if not gsquads.Squads.Config.CustomCanJoin( squad, ply ) then return false end
+    if squad.state == squad_States.locked then return false end
+    if squad.state == squad_States.private then return false end
     return true
 end
 
@@ -163,7 +185,7 @@ end
 function gsquads.Squads.UpdateGUI( ply )
 
     --net.Start('gsquads::updategui')
-    
+
     --net.Send(ply)
 
 end
