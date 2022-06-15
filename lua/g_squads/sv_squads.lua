@@ -18,6 +18,7 @@ function squad_prototype:Join(ply)
     if self.state == squad_States.private then
         ply:ChatPrint('Request Sent.')
         self:RequestJoin( ply )
+        return false
     end
 
     if not gsquads.Squads.CanJoin(ply,self) then
@@ -60,9 +61,11 @@ function squad_prototype:Delete()
 end
 
 function squad_prototype:RequestJoin(ply)
-    -- chat/gui asks
-    -- 30s timeout
-    -- deny/accept
+    self.Members[self.Commander]:ChatPrint(ply:Nick() .. 'has requested to join your squad')
+    table.insert( self.Requests, 'Gsquads_invite'..ply:SteamID() )
+    timer.Create('Gsquads_invite'..ply:SteamID(),30,0,function()
+        ply:ChatPrint('Your request was unanswered.')
+    end)
 end
 
 local squad_States = { 
@@ -77,13 +80,13 @@ function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
     local newsquad = {
-        Name = '',
         Members = {},
         Commander = 1, -- indx of commander in members table
         Kills = 0,
         Deaths = 0,
         Faction = 0,
         id = 0,
+        Requests = {},
         state = squad_States.public
     }
     setmetatable( newsquad, squad_prototype )
@@ -94,15 +97,12 @@ function gsquads.Squads.CreateNew(creator)
         print('GSQUADS : CRITICAL ERROR IN SQUAD CREATION')
     end
 
-    -- todo set squad name
-
     newsquad:Join( creator ) -- adds creator into squad (commander by default)
 
     gsquads.Squads.Count = gsquads.Squads.Count + 1
     return newsquad
 end
 
--- action permission checks here
 function gsquads.Squads.CanCreate(ply)
     if ply:GetNWInt('gsquads::squad',0) ~= 0 then return false end
     if not gsquads.Squads.Config.CustomCanCreate(ply) then return false end
@@ -134,16 +134,12 @@ util.AddNetworkString("gsquads::openhud")
 util.AddNetworkString("gsquads::updateInfo")
 util.AddNetworkString("gsquads::parUpdateInfo")
 
-util.AddNetworkString("gsquads::opengui")
-util.AddNetworkString("gsquads::updategui")
-
 
 function gsquads.Squads.UpdateClient( ply, sqd )
     local sqd = sqd or gsquads.Squads.GetCurSquad( ply )
 
     net.Start( "gsquads::updateInfo" )
     net.WriteBool(true)
-    net.WriteString( sqd.Name )
     net.WriteUInt( sqd.Kills, 16 )
     net.WriteUInt( sqd.Deaths, 16 )
     net.WriteUInt( sqd.Faction, 8 )
@@ -152,7 +148,7 @@ function gsquads.Squads.UpdateClient( ply, sqd )
 
     for _,v in ipairs( sqd.Members ) do
         net.WriteString( v:Nick() )
-        --* write any additional information about players here
+        -- write any additional information about players here
     end
     net.Send( ply )
 end
@@ -182,13 +178,6 @@ function gsquads.Squads.StopClientHud( ply )
     net.Send( ply )
 end
 
-function gsquads.Squads.UpdateGUI( ply )
-
-    --net.Start('gsquads::updategui')
-
-    --net.Send(ply)
-
-end
 
 hook.Add("Gsquads_SquadJoin",'ClientInfo', function( sqd, ply )
     gsquads.Squads.UpdateClient( sqd.Members, sqd )

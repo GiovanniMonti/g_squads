@@ -9,7 +9,6 @@ net.Receive( "gsquads::updateInfo", function()
     end
 
     --UpdateCient
-    squadInfo.Name      =   net.ReadString()
     squadInfo.Kills     =   net.ReadUInt( 16 )
     squadInfo.Deaths    =   net.ReadUInt( 16 )
     squadInfo.Faction   =   net.ReadUInt( 8 )
@@ -45,7 +44,7 @@ local function GsquadsHUD()
     surface.SetDrawColor( 255, 0, 0, 255)
     surface.SetFont( 'Trebuchet18' )
     surface.SetTextPos( leftGap, topGap )
-    surface.DrawText( squadInfo.Name .. ' Squad:')
+    surface.DrawText(' Squad:')
 
 
     for k, name in ipairs( squadInfo.Members ) do

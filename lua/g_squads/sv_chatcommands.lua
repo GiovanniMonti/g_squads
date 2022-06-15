@@ -96,7 +96,7 @@ ChatCommands.delete = function(ply,text)
     return ''
 end
 
-ComandDescs.lock = 'makes the squad private [no args]'
+ComandDescs.lock = 'lock : makes the squad private [no args]'
 ChatCommands.lock = function(ply,_)
 
     local cursquad = gsquads.Squads.GetCurSquad(ply)
@@ -136,19 +136,41 @@ ChatCommands.info = function(ply,_)
     chpr(ply,'\tCommander: ' .. squad.Members[squad.Commander]:Nick())
     chpr(ply,'\tKills: ' .. squad.Kills)
     chpr(ply,'\tDeaths: ' .. squad.Deaths)
-    chpr(ply,'\tFaction [debugging] : '.. squad.Faction)
-    chpr(ply,'\tid [debugging] : ' .. squad.id)
+    --chpr(ply,'\tFaction [debugging] : '.. squad.Faction)
+    --chpr(ply,'\tid [debugging] : ' .. squad.id)
     return ''
 end
 
-ComandDescs.gui = 'opens the gsquads GUI [no args]'
-ChatCommands.gui = function(ply,_)
+-- accept/deny someone into your squad
+ComandDescs.request = 'accepts/denies a request to join your quad. [ "accept" or "deny" ]'
+ChatCommands.request = function(ply,_)
 
-    net.Start('gsquads::opengui')
-    net.Send(ply)
+    local squad = gsquads.Squads.GetCurSquad(ply)
+    if not squad then ply:ChatPrint('You are not in a squad.') return '' end
+
+    if cursquad.Members[cursquad.Commander] ~= ply then
+        ply:ChatPrint('You are not the squad commander.')
+        return ''
+    end
+
+    local args = string.Explode( ' ', text)
+    if #args < 2 then 
+        ply:ChatPrint('Error. command usage : /squad request <accept> [or <deny>]')
+        return '' 
+    end
+    local response = args[1]
+
+    if table.IsEmpty(squad.Requests) then ply:ChatPrint('There are no requests!') return ''end
+
+    if timer.Exists(squad.Requests[#squad.Requests]) then
+        timer.Remove(squad.Requests[#squad.Requests])
+        local nply = player.GetBySteamID(string.TrimLeft( squad.Requests[#squad.Requests], 'Gsquads_invite'))
+        if response == 'accept' then squad:Join(nply) else nply:ChatPrint('Request denied!') end
+        squad.Requests[#squad.Requests] = nil 
+        return ''
+    end
 
 end
-
 
 local plyCooldowns = plyCooldowns or {}
 local cooldown = .200 --ms 
