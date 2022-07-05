@@ -96,7 +96,7 @@ ChatCommands.delete = function(ply,text)
     return ''
 end
 
-ComandDescs.lock = 'lock : makes the squad private [no args]'
+ComandDescs.lock = 'lock : locks the squad shut, requests autodenied [no args]'
 ChatCommands.lock = function(ply,_)
 
     local cursquad = gsquads.Squads.GetCurSquad(ply)
@@ -111,6 +111,49 @@ ChatCommands.lock = function(ply,_)
         return ''
     end
 
+    cursquad.state = gsquads.Squads.States.locked
+    return ''
+
+end
+
+ComandDescs.private = 'private : makes the squad private [no args]'
+ChatCommands.private = function(ply,_)
+
+    local cursquad = gsquads.Squads.GetCurSquad(ply)
+
+    if not cursquad then 
+        ply:ChatPrint('You are not in a squad.')
+        return ''
+    end
+
+    if cursquad.Members[cursquad.Commander] ~= ply then
+        ply:ChatPrint('You are not the squad commander.')
+        return ''
+    end
+
+    cursquad.state = gsquads.Squads.States.private
+    return ''
+
+end
+
+ComandDescs.open = 'open : makes the squad open [no args]'
+ChatCommands.open = function(ply,_)
+
+    local cursquad = gsquads.Squads.GetCurSquad(ply)
+
+    if not cursquad then 
+        ply:ChatPrint('You are not in a squad.')
+        return ''
+    end
+
+    if cursquad.Members[cursquad.Commander] ~= ply then
+        ply:ChatPrint('You are not the squad commander.')
+        return ''
+    end
+
+    cursquad.state = gsquads.Squads.States.public
+    return ''
+
 end
 
 -- get info about addon's commands
@@ -124,9 +167,15 @@ ChatCommands.help = function(ply,_)
 end
 -- get info on cursquad
 ComandDescs.info = 'info : prints information about the current squad. [no args]'
-ChatCommands.info = function(ply,_)
+ChatCommands.info = function(ply,text)
+    local args = string.Explode( ' ', text)
     local squad = gsquads.Squads.GetCurSquad(ply)
+    local pl = gsquads.IsPlyNick( args[1] )
+
+    if args[1] and pl then squad = gsquads.Squads:GetSquadbyCmnd( pl ) end
+
     if not squad then ply:ChatPrint('You are not in a squad.') return '' end
+
     local chpr = ply.ChatPrint
     chpr(ply,'Current squad information :')
     chpr(ply,'\tMembers:')
@@ -142,13 +191,13 @@ ChatCommands.info = function(ply,_)
 end
 
 -- accept/deny someone into your squad
-ComandDescs.request = 'accepts/denies a request to join your quad. [ "accept" or "deny" ]'
+ComandDescs.request = 'request : accepts/denies a request to join your quad. [ "accept" or "deny" ]'
 ChatCommands.request = function(ply,_)
 
     local squad = gsquads.Squads.GetCurSquad(ply)
     if not squad then ply:ChatPrint('You are not in a squad.') return '' end
 
-    if cursquad.Members[cursquad.Commander] ~= ply then
+    if squad.Members[squad.Commander] ~= ply then
         ply:ChatPrint('You are not the squad commander.')
         return ''
     end
@@ -168,6 +217,20 @@ ChatCommands.request = function(ply,_)
         if response == 'accept' then squad:Join(nply) else nply:ChatPrint('Request denied!') end
         squad.Requests[#squad.Requests] = nil 
         return ''
+    end
+
+end
+
+-- list squads
+ComandDescs.list = 'list : prints all current public & private squads. [no args]'
+ChatCommands.list = function(ply,_)
+    local chpr = ply.ChatPrint
+    chpr(ply,'Visible squads : \n')
+    for _,sqd in ipairs(gsquads.Squads.list) do
+        
+        if sqd.state == gsquads.Squads.States.locked then continue end
+        chpr(ply,'\t[' .. sqd.id ..'] ' .. sqd.Members[sqd.Commander]:Nick() .. ' - ' .. sqd.state)
+
     end
 
 end

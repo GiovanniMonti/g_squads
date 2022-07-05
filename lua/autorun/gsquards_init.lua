@@ -41,7 +41,6 @@ hook.Add('loadCustomDarkRPItems','gsquads_factions::postCustomDrp', function()
     if CLIENT then
 
         include("g_squads/cl_squads.lua")
-        include("g_squads/cl_squads_gui.lua")
 
         print([[
         ---------------------------------

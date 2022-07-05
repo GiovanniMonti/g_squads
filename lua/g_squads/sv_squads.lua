@@ -3,6 +3,14 @@ include('config/squads_config.lua')
 gsquads.Squads.Count = gsquads.Squads.Count or 0
 gsquads.Squads.list = gsquads.Squads.list or {}
 
+gsquads.Squads.States = { 
+
+    ['public'] = 1,
+    ['private'] = 2,
+    ['locked'] = 3,
+
+}
+
 local squad_prototype = {}
 squad_prototype.__index = squad_prototype
 
@@ -15,7 +23,7 @@ function squad_prototype:Join(ply)
         return false
     end
 
-    if self.state == squad_States.private then
+    if self.state == gsquads.Squads.States.private then
         ply:ChatPrint('Request Sent.')
         self:RequestJoin( ply )
         return false
@@ -68,14 +76,6 @@ function squad_prototype:RequestJoin(ply)
     end)
 end
 
-local squad_States = { 
-
-    ['public'] = 1,
-    ['private'] = 2,
-    ['locked'] = 3,
-
-}
-
 function gsquads.Squads.CreateNew(creator)
     if gsquads.Squads.Config.squad_Maxnum <= gsquads.Squads.Count or not gsquads.Squads.CanCreate(creator) then return false end
 
@@ -87,7 +87,7 @@ function gsquads.Squads.CreateNew(creator)
         Faction = 0,
         id = 0,
         Requests = {},
-        state = squad_States.public
+        state = gsquads.Squads.States.public
     }
     setmetatable( newsquad, squad_prototype )
     newsquad.Faction = gsquads.Factions.GetFaction(creator:Team())
@@ -112,8 +112,8 @@ end
 function gsquads.Squads.CanJoin(ply,squad)
     if gsquads.Factions.Config.Toggle and gsquads.Factions.jobsToFaction[ply:Team()] ~= squad.Faction then return false end
     if not gsquads.Squads.Config.CustomCanJoin( squad, ply ) then return false end
-    if squad.state == squad_States.locked then return false end
-    if squad.state == squad_States.private then return false end
+    if squad.state == gsquads.Squads.States.locked then return false end
+    if squad.state == gsquads.Squads.States.private then return false end
     return true
 end
 
