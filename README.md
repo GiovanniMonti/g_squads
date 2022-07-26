@@ -5,3 +5,4 @@ squad system for garry's mod
 - squads track total kills & deaths
 - easily integrated with other addons and many gamemodes
 - small HUD in top left of the screen with list of players in the squad
+meterials on WS https://steamcommunity.com/sharedfiles/filedetails/?id=2817260689
